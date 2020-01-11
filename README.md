@@ -2,13 +2,7 @@
 
 ## A simple script that you can use to build OrangeFox Recovery Project without losing time exporting OF specific variables
 
-### "How can I use it?" - Stable version
-
-Add in script device-specific variables (you will need to know how Bash works with this method, if you don't, use Testing version)
-
-Then just execute it. It will ask what it need to build OrangeFox
-
-### "How can I use it?" - Testing version
+### "How can I use it?"
 
 You will need to create a file containing device-specific variables, then script will automatically grab this file and pick variables
 
