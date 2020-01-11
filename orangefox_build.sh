@@ -1,6 +1,6 @@
 # OrangeFox building script by SebaUbuntu
 # You can find a list of all variables at OF_ROOT_DIR/vendor/recovery/orangefox_build_vars.txt
-SCRIPT_VERSION="v1.2"
+SCRIPT_VERSION="v2.1"
 #!/bin/bash
 
 # For clean environment
@@ -11,6 +11,9 @@ unset TARGET_ARCH
 unset OF_SCREEN_H
 unset CLEAN_BUILD_NEEDED
 clear
+
+# AOSP enviroment setup
+. build/envsetup.sh
 
 # OrangeFox logo function
 NORMAL=$(tput sgr0)
@@ -40,7 +43,7 @@ printf "                                      $SCRIPT_VERSION                   
 logo
 
 # what device are we building for?
-printf "You want to do a clean build? "y" for yes and "n" or press enter w/o typing anything for no\nAnswer: "
+printf "You want to do a clean build? ""y"" for yes and ""n"" or press enter w/o typing anything for no\nAnswer: "
 read CLEAN_BUILD_NEEDED
 clear
 
@@ -50,7 +53,7 @@ if [ $CLEAN_BUILD_NEEDED = "y" ]
 	then
 		printf "Deleting out/ dir, please wait...\n"
 		make clean
-		sleep 3
+		sleep 2
 		clear
 fi
 
@@ -66,7 +69,7 @@ logo
 # Ask for release version
 printf "Insert the version number of this release\nExample: R10.1\nVersion: "
 read TW_DEVICE_VERSION
-export TW_DEVICE_VERSION="$TW_DEVICE_VERSION"
+export TW_DEVICE_VERSION
 clear
 
 logo
@@ -74,58 +77,34 @@ logo
 # Ask for release type
 printf "Insert the type of this release\nPossibilities: Stable - Beta - RC - Unofficial\nRelease type: "
 read BUILD_TYPE
-export BUILD_TYPE="$BUILD_TYPE"
+export BUILD_TYPE
 clear
 
 logo
 
-# Export device-specific variables, remember to add them here!
-if [ $TARGET_DEVICE = "whyred" ]
+# Export device-specific variables, remember to create a config file!
+if [ -f config/$TARGET_DEVICE ]
 	then
-		export TARGET_ARCH="arm64"
-		export FOX_REPLACE_BUSYBOX_PS="1"
-		export OF_ALLOW_DISABLE_NAVBAR="0"
-		export OF_FLASHLIGHT_ENABLE="1"
-		export OF_SCREEN_H="2160"
-		export OF_STATUS_INDENT_LEFT="48"
-		export OF_STATUS_INDENT_RIGHT="48"
-elif [ $TARGET_DEVICE = "j4primelte" ]
-	then
-		export TARGET_ARCH="arm64"
-		export OF_ALLOW_DISABLE_NAVBAR="0"
-		export OF_FLASHLIGHT_ENABLE="1"
-		export OF_SCREEN_H="2220"
-		export OF_DONT_PATCH_ON_FRESH_INSTALLATION="1"
-		export OF_DISABLE_MIUI_SPECIFIC_FEATURES="1"
-elif [ $TARGET_DEVICE = "j4corelte" ]
-	then
-		export TARGET_ARCH="arm"
-		export OF_ALLOW_DISABLE_NAVBAR="0"
-		export OF_FLASHLIGHT_ENABLE="1"
-		export OF_SCREEN_H="2220"
-		export OF_DONT_PATCH_ON_FRESH_INSTALLATION="1"
-		export OF_DISABLE_MIUI_SPECIFIC_FEATURES="1"
-elif [ $TARGET_DEVICE = "j2y18lte" ]
-	then
-		export TARGET_ARCH="arm"
-		export OF_FLASHLIGHT_ENABLE="1"
-		export OF_SCREEN_H="1920"
-		export OF_DONT_PATCH_ON_FRESH_INSTALLATION="1"
-		export OF_DISABLE_MIUI_SPECIFIC_FEATURES="1"
-else
-		printf "Device-specific variables not found! Add them in script. Exiting...\n\n"
+		for i in $(cat configs/$TARGET_DEVICE.ofconf)
+			do
+				export $i
+			done
+	else
+		printf "Device-specific config not found! Create a config file as documented in GitHub repo. Exiting...\n\n"
 		exit
 fi
 
-
+# TARGET_ARCH variable is needed by OrangeFox to determine which version of binary to include
 if [ -z ${TARGET_ARCH+x} ]
 	then
-		printf "You didn't set TARGET_ARCH variable in script\n"
+		printf "You didn't set TARGET_ARCH variable in config\n"
 		exit
 fi
+
+# Define this value to fix graphical issues
 if [ -z ${OF_SCREEN_H+x} ]
 	then
-		printf "You didn't set OF_SCREEN_H variable in script\nThis variable is needed to fix graphical issues on non-16:9 devices.\nEven if you have a 16:9 device, set it anyway."
+		printf "You didn't set OF_SCREEN_H variable in config\nThis variable is needed to fix graphical issues on non-16:9 devices.\nEven if you have a 16:9 device, set it anyway."
 		exit
 fi
 
@@ -155,9 +134,6 @@ export OF_MAINTAINER="SebaUbuntu"
 [ "$OF_AB_DEVICE" = "1" ] && export OF_USE_MAGISKBOOT_FOR_ALL_PATCHES="1"
 # Enable ccache if declared
 [ "$USE_CCACHE" = "1" ] && ccache -M 20G
-
-# AOSP enviroment setup
-. build/envsetup.sh
 
 # Lunch device
 lunch omni_"$TARGET_DEVICE"-eng
