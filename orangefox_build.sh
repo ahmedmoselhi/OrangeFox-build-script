@@ -14,6 +14,7 @@ clear
 
 # AOSP enviroment setup
 . build/envsetup.sh
+clear
 
 # OrangeFox logo function
 NORMAL=$(tput sgr0)
@@ -42,20 +43,26 @@ printf "                                      $SCRIPT_VERSION                   
 
 logo
 
-# what device are we building for?
-printf "You want to do a clean build? ""y"" for yes and ""n"" or press enter w/o typing anything for no\nAnswer: "
+# Ask user if a clean build is needed
+printf "You want to do a clean build?\nAnswer: "
 read CLEAN_BUILD_NEEDED
 clear
 
 logo
 
-if [ $CLEAN_BUILD_NEEDED = "y" ]
-	then
+case $CLEAN_BUILD_NEEDED in
+	  yes|y|true)
 		printf "Deleting out/ dir, please wait...\n"
 		make clean
 		sleep 2
 		clear
-fi
+		;;
+	*)
+		printf "Clean build not required, skipping..."
+		sleep 2
+		clear
+		;;
+esac
 
 logo
 
@@ -122,7 +129,7 @@ export OF_USE_MAGISKBOOT="1"
 export OF_USE_MAGISKBOOT_FOR_ALL_PATCHES="1"
 # Prevent issues like bootloop on encrypted devices
 export OF_DONT_PATCH_ENCRYPTED_DEVICE="1"
-# Try to decrypt data with MIUI
+# Try to decrypt data when a MIUI backup is restored
 export OF_OTA_RES_DECRYPT="1"
 # Include full bash shell
 export FOX_USE_BASH_SHELL="1"
