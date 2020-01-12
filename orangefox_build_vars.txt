@@ -1,3 +1,4 @@
+# OrangeFox R10.1 build variables
 # Date: 05 January 2020
 BUILD_2GB_VERSION
 FOX_ASH_IS_BASH

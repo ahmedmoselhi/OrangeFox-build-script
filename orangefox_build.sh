@@ -93,11 +93,12 @@ logo
 if [ -f configs/"$TARGET_DEVICE"_ofconfig ]
 	then
 		for i in $(cat configs/"$TARGET_DEVICE"_ofconfig)
-			if [ "$(printf '%s' "$i" | cut -c1)" != "#" ]
-				do
+			do
+				if [ "$(printf '%s' "$i" | cut -c1)" != "#" ]
+				then
 					export $i
-				done
-			fi
+				fi
+			done
 	else
 		printf "Device-specific config not found! Create a config file as documented in GitHub repo. Exiting...\n\n"
 		exit
