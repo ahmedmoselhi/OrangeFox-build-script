@@ -10,14 +10,7 @@ unset BUILD_TYPE
 unset TARGET_ARCH
 unset OF_SCREEN_H
 unset CLEAN_BUILD_NEEDED
-clear
-
-# Telegram API
-TG_BOT_TOKEN=InsertHere
-TG_CHAT_ID=InsertHere
-
-# AOSP enviroment setup
-. build/envsetup.sh
+unset TG_POST
 clear
 
 # OrangeFox logo function
@@ -51,9 +44,45 @@ printf "AOSP environment setup, please wait...\n"
 . build/envsetup.sh
 clear
 
+logo
 # Ask user if a clean build is needed
-printf "You want to do a clean build?\nAnswer: "
-read CLEAN_BUILD_NEEDED
+printf "Do you want to post this on Telegram channel or group?\nFor info read README.md\nAnswer: "
+read TG_POST
+
+case $TG_POST in
+	yes|y|true|1)
+		TG_POST=Yes
+		printf "\nTelegram posting of this release activated\n\n"
+		sleep 1
+		;;
+	*)
+		TG_POST=No
+		printf "\nTelegram posting of this release not requested, skipping...\n\n"
+		sleep 1
+		;;
+esac
+
+# Telegram API values import
+IFS="
+"
+if [ $TG_POST = "Yes" ]
+	then
+		if [ -f telegram_api.txt ]
+		then
+			for i in $(cat telegram_api.txt)
+				do
+					if [ "$(printf '%s' "$i" | cut -c1)" != "#" ]
+					then
+						export $i
+					fi
+				done
+		else
+			printf "Telegram API values not found! Telegram post will be skipped\n\n"
+			exit
+		fi
+fi
+IFS=" "
+
 clear
 
 logo

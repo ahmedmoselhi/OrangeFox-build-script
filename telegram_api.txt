@@ -1,0 +1,5 @@
+# NOTE! ADD VALUES WITHOUT DOUBLE QUOTES
+# Bot token can be obtained from here https://my.telegram.org/auth
+TG_BOT_TOKEN=
+# Chat ID of a group or of a channel can be found with a bot like Rose by writing /chatid
+TG_CHAT_ID=
