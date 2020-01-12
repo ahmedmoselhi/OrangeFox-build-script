@@ -8,8 +8,8 @@
 
  - Give to scripts executing permissions
 
- - Create a file containing device-specific variables and put it in <pre><code>OF_ROOT/configs/CODENAME.ofconf</code></pre>
-Example for whyred: <pre><code>OF_ROOT/configs/whyred.ofconf</code></pre>
+ - Create a file containing device-specific variables and put it in <pre><code>OF_ROOT/configs/CODENAME_ofconfig</code></pre>
+Example for whyred: <pre><code>OF_ROOT/configs/whyred_ofconfig</code></pre>
 See other ofconfigs for reference
 
  - Run the script with <pre><code> ./orangefox_build.sh </code></pre>

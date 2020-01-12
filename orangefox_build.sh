@@ -90,9 +90,9 @@ clear
 logo
 
 # Export device-specific variables, remember to create a config file!
-if [ -f config/$TARGET_DEVICE ]
+if [ -f configs/"$TARGET_DEVICE"_ofconfig ]
 	then
-		for i in $(cat configs/$TARGET_DEVICE.ofconf)
+		for i in $(cat configs/"$TARGET_DEVICE"_ofconfig)
 			if [ "$(printf '%s' "$i" | cut -c1)" != "#" ]
 				do
 					export $i

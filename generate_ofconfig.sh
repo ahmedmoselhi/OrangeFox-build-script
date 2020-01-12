@@ -23,7 +23,7 @@ printf "${NORMAL}                                 ${REVERSE}  ${NORMAL}  ${REVER
 printf "${NORMAL}                                 ${REVERSE}  ${NORMAL}  ${REVERSE}  ${NORMAL}     ${REVERSE} ${NORMAL}   ${REVERSE}  ${NORMAL}                             ${REVERSE}\n"
 printf "${NORMAL}                                                                               \n"
 printf "                           OrangeFox Recovery Project                          \n\n"
-printf "                         OFCONF generator by SebaUbuntu                        \n\n"
+printf "                        OFCONFIG generator by SebaUbuntu                       \n\n"
 printf "                                      $SCRIPT_VERSION                                      \n\n"
 }
 
@@ -102,10 +102,10 @@ IFS=" "
 # Copy to a new file config variables
 echo "# OrangeFox config file for $TARGET_DEVICE
 # Config based on OrangeFox $SCRIPT_VERSION variables, support for newer versions can't be guaranteed
-# Created by generate_ofconf.sh at $(date)
+# Created by generate_ofconfig.sh at $(date)
 TARGET_ARCH="$TARGET_ARCH"
 DEVICE_RESOLUTION="$DEVICE_RESOLUTION"
-OF_SCREEN_H="$OF_SCREEN_H"" > configs/$TARGET_DEVICE.ofconf
+OF_SCREEN_H="$OF_SCREEN_H"" > configs/"$TARGET_DEVICE"_ofconfig
 
 IFS="
 "
@@ -114,7 +114,7 @@ for i in $(cat orangefox_build_vars.txt)
 		do 
 			if [ "$(printf '%s' "$i" | cut -c1)" != "#" ] 
 				then 
-					echo "$i=${!i}" >> configs/$TARGET_DEVICE.ofconf
+					echo "$i=${!i}" >> configs/"$TARGET_DEVICE"_ofconfig
 			fi 
 		done
 
