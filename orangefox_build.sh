@@ -41,11 +41,15 @@ printf "${NORMAL}                                 ${REVERSE}  ${NORMAL}  ${REVER
 printf "${NORMAL}                                 ${REVERSE}  ${NORMAL}  ${REVERSE}  ${NORMAL}     ${REVERSE} ${NORMAL}   ${REVERSE}  ${NORMAL}                             ${REVERSE}\n"
 printf "${NORMAL}                                                                               \n"
 printf "                           OrangeFox Recovery Project                          \n\n"
-printf "                           Build script by SebaUbuntu                          \n\n"
+printf "                           Build script by SebaUbuntu                          \n"
 printf "                                      $SCRIPT_VERSION                                      \n\n"
 }
 
 logo
+# AOSP enviroment setup
+printf "AOSP environment setup, please wait...\n"
+. build/envsetup.sh
+clear
 
 # Ask user if a clean build is needed
 printf "You want to do a clean build?\nAnswer: "
@@ -53,32 +57,33 @@ read CLEAN_BUILD_NEEDED
 clear
 
 logo
+# Ask user if a clean build is needed
+printf "Do you want to do a clean build?\nAnswer: "
+read CLEAN_BUILD_NEEDED
 
 case $CLEAN_BUILD_NEEDED in
-	  yes|y|true)
+	yes|y|true|1)
 		CLEAN_BUILD_NEEDED=Yes
-		printf "Deleting out/ dir, please wait...\n"
+		printf "\nDeleting out/ dir, please wait...\n"
 		make clean
 		sleep 2
 		clear
 		;;
 	*)
 		CLEAN_BUILD_NEEDED=No
-		printf "Clean build not required, skipping..."
+		printf "\nClean build not required, skipping..."
 		sleep 2
 		clear
 		;;
 esac
 
 logo
-
 # what device are we building for?
 printf "Insert the device codename you want to build for\nCodename: "
 read TARGET_DEVICE
 clear
 
 logo
-
 # Ask for release version
 printf "Insert the version number of this release\nExample: R10.1\nVersion: "
 read TW_DEVICE_VERSION
@@ -86,7 +91,6 @@ export TW_DEVICE_VERSION
 clear
 
 logo
-
 # Ask for release type
 printf "Insert the type of this release\nPossibilities: Stable - Beta - RC - Unofficial\nRelease type: "
 read BUILD_TYPE
@@ -96,6 +100,8 @@ clear
 logo
 
 # Export device-specific variables, remember to create a config file!
+IFS="
+"
 if [ -f configs/"$TARGET_DEVICE"_ofconfig ]
 	then
 		for i in $(cat configs/"$TARGET_DEVICE"_ofconfig)
@@ -109,6 +115,7 @@ if [ -f configs/"$TARGET_DEVICE"_ofconfig ]
 		printf "Device-specific config not found! Create a config file as documented in GitHub repo. Exiting...\n\n"
 		exit
 fi
+IFS=" "
 
 # TARGET_ARCH variable is needed by OrangeFox to determine which version of binary to include
 if [ -z ${TARGET_ARCH+x} ]
@@ -181,7 +188,9 @@ Device: $TARGET_DEVICE
 Architecture: $TARGET_ARCH
 Clean build: $CLEAN_BUILD_NEEDED
 Output:"
+		printf "\n"
 		curl -F name=document -F document=@"out/target/product/$TARGET_DEVICE/OrangeFox-$TW_DEVICE_VERSION-$BUILD_TYPE-$TARGET_DEVICE.zip" -H "Content-Type:multipart/form-data" "https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument?chat_id=$TG_CHAT_ID"
+		printf "\n"
 	else
 		curl -s -X POST "https://api.telegram.org/bot$TG_BOT_TOKEN/editMessageText" -d chat_id=$TG_CHAT_ID -d message_id=$MESSAGE_ID -d text="Build failed!
 
@@ -190,6 +199,7 @@ Device: $TARGET_DEVICE
 Architecture: $TARGET_ARCH
 Clean build: $CLEAN_BUILD_NEEDED
 Output:"
+		printf "\n"
 fi
 
 
