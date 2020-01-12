@@ -12,6 +12,10 @@ unset OF_SCREEN_H
 unset CLEAN_BUILD_NEEDED
 clear
 
+# Telegram API
+TG_BOT_TOKEN=InsertHere
+TG_CHAT_ID=InsertHere
+
 # AOSP enviroment setup
 . build/envsetup.sh
 clear
@@ -52,12 +56,14 @@ logo
 
 case $CLEAN_BUILD_NEEDED in
 	  yes|y|true)
+		CLEAN_BUILD_NEEDED=Yes
 		printf "Deleting out/ dir, please wait...\n"
 		make clean
 		sleep 2
 		clear
 		;;
 	*)
+		CLEAN_BUILD_NEEDED=No
 		printf "Clean build not required, skipping..."
 		sleep 2
 		clear
@@ -153,7 +159,37 @@ if [ "$?" != "0" ]
 	then exit
 fi
 
+# Send message about started build
+MESSAGE_ID=$(curl -s -X POST "https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage" -d chat_id=$TG_CHAT_ID -d text="Build started
+
+OrangeFox $TW_DEVICE_VERSION $BUILD_TYPE
+Device: $TARGET_DEVICE
+Architecture: $TARGET_ARCH
+Clean build: $CLEAN_BUILD_NEEDED
+Output:" | jq -r '.result.message_id')
+
 # Start building
 mka recoveryimage
+
+# If build had success, send file to a Telegram channel, else say failed
+if [ "$?" = "0" ]
+	then
+		curl -s -X POST "https://api.telegram.org/bot$TG_BOT_TOKEN/editMessageText" -d chat_id=$TG_CHAT_ID -d message_id=$MESSAGE_ID -d text="Build finished!
+
+OrangeFox $TW_DEVICE_VERSION $BUILD_TYPE
+Device: $TARGET_DEVICE
+Architecture: $TARGET_ARCH
+Clean build: $CLEAN_BUILD_NEEDED
+Output:"
+		curl -F name=document -F document=@"out/target/product/$TARGET_DEVICE/OrangeFox-$TW_DEVICE_VERSION-$BUILD_TYPE-$TARGET_DEVICE.zip" -H "Content-Type:multipart/form-data" "https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument?chat_id=$TG_CHAT_ID"
+	else
+		curl -s -X POST "https://api.telegram.org/bot$TG_BOT_TOKEN/editMessageText" -d chat_id=$TG_CHAT_ID -d message_id=$MESSAGE_ID -d text="Build failed!
+
+OrangeFox $TW_DEVICE_VERSION $BUILD_TYPE
+Device: $TARGET_DEVICE
+Architecture: $TARGET_ARCH
+Clean build: $CLEAN_BUILD_NEEDED
+Output:"
+fi
 
 
